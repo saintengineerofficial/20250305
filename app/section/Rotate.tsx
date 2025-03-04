@@ -11,7 +11,7 @@ type Rotations = Record<number, number>
 
 const Rotate = () => {
   const [file, setFile] = useState<File | null>(null)
-  const [preview, setPreview] = useState<string | null>(null)
+  const [url, setUrl] = useState<string>('')
   const [pages, setPages] = useState<number>(0);
   const [pageRotations, setPageRotations] = useState<Rotations>({});
   const [pageScale, setPageScale] = useState(1)
@@ -57,7 +57,7 @@ const Rotate = () => {
     if (selectedFile && selectedFile.type === "application/pdf") {
       setFile(selectedFile)
       const fileUrl = URL.createObjectURL(selectedFile)
-      setPreview(fileUrl)
+      setUrl(fileUrl)
     }
   }
 
@@ -67,7 +67,7 @@ const Rotate = () => {
     if (droppedFile && droppedFile.type === "application/pdf") {
       setFile(droppedFile)
       const fileUrl = URL.createObjectURL(droppedFile)
-      setPreview(fileUrl)
+      setUrl(fileUrl)
     }
   }
 
@@ -76,7 +76,7 @@ const Rotate = () => {
   }
 
   const handleDownload = async () => {
-    if (preview && file) {
+    if (url && file) {
 
       setIsProcessing(true);
 
@@ -120,7 +120,7 @@ const Rotate = () => {
   }
 
   const handleReset = () => {
-    setPreview('')
+    setUrl('')
     setFile(null)
   }
 
@@ -132,7 +132,7 @@ const Rotate = () => {
           Simply click on a page to rotate it. You can then download your modified PDF.
         </p>
 
-        {!preview ? (
+        {!url ? (
           <div
             className="self-center flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg bg-white cursor-pointer h-[350px] text-center w-[275px]"
             onClick={() => document.getElementById("pdf-upload")?.click()}

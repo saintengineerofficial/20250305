@@ -1,6 +1,6 @@
 import React from 'react'
 import Link from "next/link"
-import { SproutIcon, Circle, Youtube, Twitter, Instagram } from "lucide-react"
+import { Circle, Youtube, Twitter, Instagram } from "lucide-react"
 
 type Props = {}
 
@@ -39,8 +39,7 @@ const Footer = (props: Props) => {
     <footer className="w-full py-12 border-t border-gray-100">
       <div className="mx-auto max-w-7xl">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8 border-t py-20 px-15">
-
-          <div className="space-y-4">
+          <div className="space-y-4 ml-10">
             <div className="flex items-center">
               <Circle className="h-8 w-8" />
             </div>
@@ -66,8 +65,8 @@ const Footer = (props: Props) => {
               </Link>
             </div>
           </div>
-          <div>
-            <h3 className="text-lg font-medium mb-4">Products</h3>
+          <div className="ml-10">
+            <h3 className="text-base font-bold mb-4">Products</h3>
             <ul className="space-y-3">
               {products.map(product => (
                 <li key={product.name}>
@@ -79,8 +78,8 @@ const Footer = (props: Props) => {
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-4">We also built</h3>
+          <div className="ml-10">
+            <h3 className="text-base font-bold mb-4">We also built</h3>
             <ul className="space-y-3">
               {builds.map(build => (
                 <li key={build.name}>
@@ -92,8 +91,8 @@ const Footer = (props: Props) => {
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-4">Company</h3>
+          <div className="ml-10">
+            <h3 className="text-base font-bold mb-4">Company</h3>
             <ul className="space-y-3">
               {companys.map(company => (
                 <li key={company.name}>
