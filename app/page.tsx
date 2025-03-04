@@ -7,7 +7,6 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Rotate PDF - Free Online PDF Rotation Tool</title>
         <meta
           name="description"
           content="Free online tool to rotate PDF pages. Rotate PDF pages individually or all at once. No upload needed - process files locally in your browser."

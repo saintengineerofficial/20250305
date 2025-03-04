@@ -8,7 +8,7 @@ const Header = () => {
       <div className="flex justify-between items-center">
         <Link href="/" className="flex items-center gap-2 font-bold text-xl">
           <Circle />
-          Saint PDF.ai
+          Saint(czh) PDF.ai
         </Link>
         <nav className="hidden md:flex items-center space-x-6">
           <Link href="/pricing" className="text-sm font-bold hover:text-gray-600">

@@ -1,9 +1,10 @@
 'use client'
 import { Button } from '@/components/ui/button'
-import { Download, LoaderCircle, RotateCw, Upload, ZoomIn, ZoomOut } from 'lucide-react'
+import { Download, LoaderCircle, RotateCw, ZoomIn, ZoomOut } from 'lucide-react'
 import { PDFDocument, RotationTypes } from 'pdf-lib';
 import React, { useState } from 'react'
 import { Document, Page, pdfjs } from 'react-pdf';
+import UploadInput from '../components/UploadInput';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.js`;
 
@@ -12,7 +13,7 @@ type Rotations = Record<number, number>
 const Rotate = () => {
   const [file, setFile] = useState<File | null>(null)
   const [url, setUrl] = useState<string>('')
-  const [pages, setPages] = useState<number>(0);
+  const [pages, setPages] = useState(0);
   const [pageRotations, setPageRotations] = useState<Rotations>({});
   const [pageScale, setPageScale] = useState(1)
   const [isProcessing, setIsProcessing] = useState(false)
@@ -52,38 +53,13 @@ const Rotate = () => {
     setPageRotations(initialRotations);
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0]
-    if (selectedFile && selectedFile.type === "application/pdf") {
-      setFile(selectedFile)
-      const fileUrl = URL.createObjectURL(selectedFile)
-      setUrl(fileUrl)
-    }
-  }
-
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-    const droppedFile = e.dataTransfer.files[0]
-    if (droppedFile && droppedFile.type === "application/pdf") {
-      setFile(droppedFile)
-      const fileUrl = URL.createObjectURL(droppedFile)
-      setUrl(fileUrl)
-    }
-  }
-
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
-    e.preventDefault()
-  }
-
   const handleDownload = async () => {
     if (url && file) {
-
       setIsProcessing(true);
 
       try {
         const fileArrayBuffer = await file.arrayBuffer();
         const pdfDoc = await PDFDocument.load(fileArrayBuffer);
-
         const pages = pdfDoc.getPages();
 
         Object.entries(pageRotations).forEach(([pageNumber, rotation]) => {
@@ -102,7 +78,6 @@ const Rotate = () => {
         });
 
         const modifiedPdfBytes = await pdfDoc.save();
-
         const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
 
         const downloadLink = document.createElement('a');
@@ -132,76 +107,55 @@ const Rotate = () => {
           Simply click on a page to rotate it. You can then download your modified PDF.
         </p>
 
-        {!url ? (
-          <div
-            className="self-center flex items-center justify-center border-2 border-dashed border-gray-300 rounded-lg bg-white cursor-pointer h-[350px] text-center w-[275px]"
-            onClick={() => document.getElementById("pdf-upload")?.click()}
-            onDrop={handleDrop}
-            onDragOver={handleDragOver}
-          >
-            <input
-              id="pdf-upload"
-              type="file"
-              accept="application/pdf"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            <div className="flex flex-col items-center justify-center ">
-              <div className="w-16 h-16 mb-4 flex items-center justify-center rounded-full bg-gray-100">
-                <Upload className="h-8 w-8 text-gray-500" />
+        {!url ? <UploadInput onSetFile={(file: File) => setFile(file)} onSetUrl={(url: string) => setUrl(url)} /> :
+          (
+            <div className="space-y-6 flex flex-col items-center justify-center">
+              <div className="flex items-center gap-4">
+                <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={() => rotateAllPages('clockwise')}>Rotate all</Button>
+                <Button onClick={handleReset}>Remove PDF</Button>
+                <ZoomIn className="h-6 w-6 cursor-pointer" onClick={() => setPageScale(prevScale => prevScale + 0.2)}></ZoomIn>
+                <ZoomOut className="h-6 w-6 cursor-pointer" onClick={() => setPageScale(prevScale => prevScale - 0.2)}></ZoomOut>
               </div>
-              <p className="text-sm text-gray-500">Click to upload or drag and drop</p>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-6 flex flex-col items-center justify-center">
-            <div className="flex items-center gap-4">
-              <Button className="bg-orange-500 hover:bg-orange-600 text-white" onClick={() => rotateAllPages('clockwise')}>Rotate all</Button>
-              <Button onClick={handleReset}>Remove PDF</Button>
-              <ZoomIn className="h-6 w-6 cursor-pointer" onClick={() => setPageScale(prevScale => prevScale + 0.2)}></ZoomIn>
-              <ZoomOut className="h-6 w-6 cursor-pointer" onClick={() => setPageScale(prevScale => prevScale - 0.2)}></ZoomOut>
-            </div>
-            <div>
-              <Document
-                file={file}
-                onLoadSuccess={onDocumentLoadSuccess}
-                className="w-full grid grid-cols-5 gap-5"
-              >
-                {pageRotations && Array.from(new Array(pages), (el, index) => (
-                  <div key={`page_${index + 1}`} className="relative overflow-hidden transition-transform">
-                    <div className="absolute z-10 top-1 right-1 p-1 bg-orange-500 text-white rounded-full cursor-pointer"
-                      onClick={() => rotatePage(index + 1, 'counterclockwise')}>
-                      <RotateCw className="w-4 h-4" />
-                    </div>
-                    <div className="shadow-md p-3 bg-white hover:bg-gray-50 ">
-                      <div className='relative h-full w-full flex flex-col justify-between items-center transition-transform origin-center'
-                        style={{ transform: `rotate(${pageRotations[index + 1] || 0}deg)` }}>
-                        <Page
-                          pageNumber={index + 1}
-                          rotate={pageRotations[index + 1] || 90}
-                          width={250}
-                          height={200}
-                          renderTextLayer={false}
-                          renderAnnotationLayer={false}
-                          scale={pageScale}
-                        />
+              <div>
+                <Document
+                  file={file}
+                  onLoadSuccess={onDocumentLoadSuccess}
+                  className="w-full grid grid-cols-5 gap-5"
+                >
+                  {pageRotations && Array.from(new Array(pages), (el, index) => (
+                    <div key={`page_${index + 1}`} className="relative overflow-hidden">
+                      <div className="absolute z-10 top-1 right-1 p-1 bg-orange-500 hover:bg-orange-600 text-white rounded-full cursor-pointer"
+                        onClick={() => rotatePage(index + 1, 'counterclockwise')}>
+                        <RotateCw className="w-4 h-4" />
                       </div>
-                      <span className="text-sm font-medium">{index + 1}</span>
+                      <div className="shadow-md p-3 bg-white hover:bg-gray-50 ">
+                        <div className='relative h-full w-full flex flex-col justify-between items-center transition-transform origin-center'
+                          style={{ transform: `rotate(${pageRotations[index + 1] || 0}deg)` }}>
+                          <Page
+                            pageNumber={index + 1}
+                            rotate={pageRotations[index + 1] || 90}
+                            width={250}
+                            renderTextLayer={false}
+                            renderAnnotationLayer={false}
+                            scale={pageScale}
+                          />
+                        </div>
+                        <span className="text-sm font-medium">{index + 1}</span>
+                      </div>
                     </div>
-                  </div>
-                ))}
-              </Document>
+                  ))}
+                </Document>
+              </div>
+
+              <Button onClick={handleDownload} className="bg-orange-500 hover:bg-orange-600 text-white">
+                {isProcessing ? <LoaderCircle className="animate-spin" /> : <>
+                  <Download className="mr-2 h-4 w-4" />
+                  Download
+                </>}
+              </Button>
             </div>
-
-            <Button onClick={handleDownload} className="bg-orange-500 hover:bg-orange-600 text-white">
-              {isProcessing ? <LoaderCircle className="animate-spin" /> : <>
-                <Download className="mr-2 h-4 w-4" />
-                Download
-              </>}
-
-            </Button>
-          </div>
-        )}
+          )
+        }
       </div>
     </div>
   )
