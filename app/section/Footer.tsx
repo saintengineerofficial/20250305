@@ -2,7 +2,6 @@ import React from 'react'
 import Link from "next/link"
 import { Circle, Youtube, Twitter, Instagram } from "lucide-react"
 
-type Props = {}
 
 const products = [
   { href: '#', name: 'Use cases' },
@@ -34,7 +33,7 @@ const companys = [
   { href: '#', name: 'Investor' },
 ]
 
-const Footer = (props: Props) => {
+const Footer = () => {
   return (
     <footer className="w-full py-12 border-t border-gray-100">
       <div className="mx-auto max-w-7xl">
